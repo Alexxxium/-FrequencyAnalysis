@@ -1,139 +1,140 @@
 #pragma once
-#include <string>		// test
+
+#include <iterator>
 #include <list>
-#include <initializer_list>
+#include <string>
 #include <iostream>
-
-
-
-
-
-
 
 struct Node
 {
 	int key;
 	std::string value;
 
-	Node(const int k, const std::string &v): key(k), value(v){}
+	explicit Node(const int &k, const std::string &vl): key(k), value(vl) {}
+
+	Node(const Node &node): key(node.key), value(node.value) {}
+
+	void operator=(const Node &node) { 
+		key = node.key; 
+		value = node.value; 
+	}
+
+	bool operator== (const int &vl)     const { return key == vl; }
+	auto operator<=>(const int &vl)     const { return key <=> vl; }
+	bool operator== (const Node &node)  const { return key == node.key; }
+	auto operator<=>(const Node &node)  const { return key <=> node.key; }
 };
+
 
 class HashTable
 {
 private:
 
-	static size_t default_capacity;
-	static float full_redist;
+	typedef std::list<Node*> List;
 
-	size_t lenght, capacity;
-	std::list<Node*> *arr;
+	static int defailtCapacity;
+	static float redistCoeff;
 
-	int Hash(Node *node) { return node->key % capacity; }
-	//int operator()(Node* node) { return Hash(node); }
+	size_t capacity, count;
 
-	void DestroyArray()
-	{
-		for (int i = 0; i < capacity; ++i)
-			for (const auto &j : arr[i])
-				delete j;
+	std::list<Node*> *array;
 
-		delete[] arr;
-	}
+	size_t Hash(const Node *node) const;
+	size_t Hash(const int &key)   const;
+
+	void DestroyArray(List*) const;
+
+	void reHash(const List*);
+	void reWrite(const List*);
+	
 
 public:
 
-	HashTable(int cpct = 0):lenght(0)
-	{
-		if (cpct < 0) throw 1;
+	explicit HashTable(int cpcty = defailtCapacity);
+	HashTable(const HashTable&);
 
-		if (cpct == 0)
-			cpct = default_capacity;
+	void operator=(const HashTable&);
 
-		capacity = cpct;
+	~HashTable() { DestroyArray(array); }
 
-		arr = new std::list<Node*>[cpct];
-		
-	}
-	///*HashTable(const HashTable& copy)
-	//{
-	//	if (&copy == this) return;
-	//
-	//	lenght = copy.lenght;
-	//	capacity = copy.capacity;
-	//
-	//	arr = copy.arr;
-	//}
-	
-	void operator=(const HashTable& copy)
-	{
-		if (&copy == this) return;
+	void reserve(const int);
 
-		lenght = copy.lenght;
-		capacity = copy.capacity;
-
-		DestroyArray();
-
-		arr = copy.arr;
-	}
-
-	~HashTable() { DestroyArray(); }
-
-	void reserv(const int cpct)
-	{
-		std::cout << "\n\nRESERV\n\n";
-
-		size_t tempCap = cpct / 2;
-		std::list<Node*> *temp = arr;
-		arr = new std::list<Node*>[cpct];
-
-		capacity = cpct;
-
-		for (int i = 0; i < tempCap; ++i)
-			for (const auto &j : temp[i])
-				arr[Hash(j)].push_back(j);
-
-		//DestroyArray();
-	}
-
-	void push(const int key, const std::string& value)
-	{
-		Node *newData = new Node(key, value);
-
-		arr[Hash(newData)].push_back(newData);
-
-		if (++lenght * 1.0 / capacity >= full_redist)
-			reserv(capacity * 2);
-	}
-	
-	Node* find(const int key)
-	{
-		for (const auto &i : arr[key % capacity])
-			if (i->key == key)
-				return i;
-
-		return nullptr;
-	}
-
-	void pop(const int key)
-	{
-		for (const auto &i : arr[key % capacity])
-			if (key == i->key) {
-				delete i;
-				//arr[key % capacity].erase(i);
-			}	
-	}
-
-	void out()
-	{
-		for (int i = 0; i < capacity; ++i) {
-			for (const auto &j : arr[i])
-				std::cout << '(' << j->key << ' ' << j->value << ")\t";
-			std::cout << '\n';
-		}
-			
-	}
+	void insert(const Node*);
 };
 
 
-size_t HashTable::default_capacity = 10;
-float HashTable::full_redist = 0.75;
+int HashTable::defailtCapacity = 10;
+float HashTable::redistCoeff = 0.75;
+
+
+HashTable::HashTable(int cpcty): count(0), capacity(cpcty) 
+{
+	if (cpcty < 0) throw 1;
+
+	array = new std::list<Node*>[capacity];
+}
+HashTable::HashTable(const HashTable &copy):
+	count(copy.count), 
+	capacity(copy.capacity) 
+{
+	array = new List[capacity];
+
+	reWrite(copy.array);
+}
+void HashTable::operator=(const HashTable &copy)
+{
+	if (&copy == this) return;
+
+	count = copy.count;
+	capacity = copy.capacity;
+
+	DestroyArray(array);
+	array = new List[capacity];
+
+	reWrite(copy.array);
+}
+void HashTable::DestroyArray(List *arr) const
+{
+	for (int i = 0; i < capacity; ++i) 
+		for (const auto &it : arr[i])
+			delete it;
+		
+	delete[] arr;	
+}
+
+
+size_t HashTable::Hash(const Node *node) const
+{
+	return node->key % capacity;
+}
+size_t HashTable::Hash(const int &key)   const
+{
+	return key % capacity;
+}
+
+
+void HashTable::reHash (const List *copy)
+{
+	for (int i = 0; i < capacity; ++i)
+		for (const auto &it : copy[i])
+			array[Hash(it)].push_back(it);
+}
+void HashTable::reWrite(const List *copy)
+{
+	for (int i = 0; i < capacity; ++i)
+		for (const auto &it : copy[i])
+			array[i].push_back(it);
+}
+void HashTable::reserve(const int newCapacity)						// ??????????
+{
+	if (newCapacity <= capacity) return;
+	if (newCapacity < 0) throw 1;
+
+	capacity = newCapacity;
+
+	List *temp = array;
+	array = new List[capacity];
+
+	reHash(temp);
+	DestroyArray(temp);
+}

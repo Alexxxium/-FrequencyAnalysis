@@ -1,18 +1,36 @@
 ﻿
 #include <iostream>
-#include <unordered_map>
-#include <string>
 #include "HashTable.h"
+#include <vector>
+#include <unordered_map>
 
 int main()
 {
-	HashTable table;
-#include <list>
+	int a = 1;
+	int b = 7;
+	auto s = (a <=> b);
+	//if(s == 0)
 
-	std::list<int> a = { 1, 2, 3, 4, 5, 6, 7, 8, 9};
-	a;
-	a.erase(a.begin());
-	a;
+	Node node1(2, "sas");
+	Node node2(2, "sas");
+
+	std::cout << (2 <= node1) << '\n';
+	std::cout << (node1 > 1) << '\n';
+	std::cout << (node1 <= 1) << '\n';
+	std::cout << (node2 >= node1) << '\n';
+	std::cout << (1 == node1) << '\n';
+	std::cout << (1 != node1) << '\n';
+	std::cout << (node1 == 2) << '\n';
+	std::cout << (node1 != 1) << '\n';
+	
+	std::unordered_map <float, const char*> map{ {1, "sas"}};
+
+	
+
+
+	
+	
+	
 }
 
 
