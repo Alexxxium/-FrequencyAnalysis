@@ -1,5 +1,4 @@
-﻿
-#include <iostream>
+﻿#include <iostream>
 #include "HashTable.h"
 #include <vector>
 #include <unordered_map>
@@ -22,15 +21,13 @@ int main()
 	std::cout << (1 != node1) << '\n';
 	std::cout << (node1 == 2) << '\n';
 	std::cout << (node1 != 1) << '\n';
-	
-	std::unordered_map <float, const char*> map{ {1, "sas"}};
+
+	std::unordered_map <float, const char*> map{ {1, "sas"} };
+
+
 
 	
 
 
-	
-	
-	
+
 }
-
-
