@@ -41,7 +41,7 @@ private:
     }
     void countLetters()
     {
-        for (const auto &i : text)
+        for (const auto i : text)
         {
             if (i >= 'а' && i <= 'я')
                 ++freq[i];
@@ -58,7 +58,7 @@ private:
         countLetters();
         std::vector<std::pair<size_t, char>> vec;
 
-        for (auto &i : freq)
+        for (auto i : freq)
         {
             std::cout << '\n' << i.first << '\t' << i.second;
             std::pair<size_t, char> temp;
